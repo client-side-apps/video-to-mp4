@@ -1,5 +1,5 @@
 const cacheVersion = 'v1';
-const cacheName = 'pdf-to-svg-' + cacheVersion;
+const cacheName = 'videor-to-mp4-' + cacheVersion;
 
 const urlsToCache = [
   "/",
@@ -56,7 +56,7 @@ self.addEventListener('fetch', async (event) => {
 
       const allWindowsClients = await clients.matchAll();
 
-      if(allWindowsClients.length > 0) {
+      if (allWindowsClients.length > 0) {
         console.log("Found clients to send files");
         for (const client of allWindowsClients) {
           client.postMessage({
@@ -66,7 +66,7 @@ self.addEventListener('fetch', async (event) => {
       } else {
         console.error('No clients found to send files to');
       }
-      
+
       return Response.redirect('/', 303);
     })());
   } else {
@@ -78,10 +78,6 @@ self.addEventListener('fetch', async (event) => {
         return cache.match(event.request).then((response) => {
           return response || fetch(event.request).then((response) => {
             console.log(`Fetching from network: ${event.request.url}`);
-            if (event.request.url.endsWith('.js') && event.request.url.startsWith(cdnPrefix)) { 
-              console.log(`Caching ${event.request.url}`);
-              cache.put(event.request, response.clone());
-            }
             return response;
           });
         });
