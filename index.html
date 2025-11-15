@@ -2,27 +2,27 @@
 <html>
 
 <head>
-	<title>Audio to Video client-side converter</title>
+	<title>Video to MP4 client-side converter</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:creator" content="@steren">
-	<meta name="twitter:title" content="Online Audio to Video client-side converter">
-	<meta name="twitter:image" content="https://audio-to-video.client-side.app/icons/title.png">
-  
+	<meta name="twitter:title" content="Online Video to MP4 client-side converter">
+	<meta name="twitter:image" content="https://video-to-mp4.client-side.app/icons/title.png">
+
 	<meta property="og:type" content="article">
-	<meta property="og:title" content="Online Audio to Video client-side converter">
-	<meta property="og:image" content="https://audio-to-video.client-side.app/icons/title.png">
-  
+	<meta property="og:title" content="Online Video to MP4 client-side converter">
+	<meta property="og:image" content="https://video-to-mp4.client-side.app/icons/title.png">
+
 	<script type="application/ld+json">
 	{
 	  "@context": "http://schema.org",
 	  "@type": "WebSite",
 	  "author": "Steren Giannini",
-	  "name": "Online Audio to Video client-side converter",
-	  "image": "https://audio-to-video.client-side.app/icons/title.png"
+	  "name": "Online Video to MP4 client-side converter",
+	  "image": "https://video-to-mp4.client-side.app/icons/title.png"
 	}
 	</script>
 
@@ -76,37 +76,33 @@
 
 	<header>
 		<img src="icons/icon.svg" alt="icon" class="icon">
-		<h1>An online Audio to Video converter</h1>
+		<h1>An online Video to MP4 converter</h1>
 		<p>
-			An online <b>client-side</b> web app to transform an audio file (for example .mp3) into a video file (.mp4).<br>
+			An online <b>client-side</b> web app to transform any video file into a .mp4 file.<br>
 			Files are <b>not</b> uploaded to any server, they are converted in your browser.
 		</p>
 	</header>
 
 	<main>
 		<div>
-			<label for="audioInput">Select an audio file:</label>
-			<input type="file" id="audioInput" accept="audio/*">
-			<audio id="audioPreview" controls style="display: none;"></audio>
-		</div>
-		<div>
-			<label for="imageInput">Select an image:</label>
-			<input type="file" id="imageInput" accept="image/*">
-			<img id="imagePreview" width="320" height="240" style="display: none;">
+			<label for="videoInput">Select a video file:</label>
+			<input type="file" id="videoInput" accept="video/*">
 		</div>
 
-		<button id="createBtn" disabled>Create Video</button>
+		<button id="createBtn" disabled>Convert to MP4</button>
 
 		<progress id="progressBar" value="0" max="100" style="display: none;"></progress>
 
 		<video id="videoPreview" width="320" height="240" controls style="display: none;"></video>
 
-		<button id="downloadBtn" style="display: none;">Download Video</button>
+		<button id="downloadBtn" style="display: none;">Download MP4</button>
 	</main>
 
 	<footer>
 		<p>
-			Built by <a target="_blank" href="https://steren.fr">Steren</a> using <a target="_blank" href="https://github.com/ffmpegwasm/ffmpeg.wasm">ffmpeg.wasm</a> (<a href="https://github.com/client-side-apps/audio-to-video">source code</a>).
+			Built by <a target="_blank" href="https://steren.fr">Steren</a> using <a target="_blank"
+				href="https://github.com/ffmpegwasm/ffmpeg.wasm">ffmpeg.wasm</a> (<a
+				href="https://github.com/client-side-apps/video-to-mp4">source code</a>).
 		</p>
 	</footer>
 
@@ -125,39 +121,20 @@
 		});
 
 
-		const imageInput = document.getElementById('imageInput');
-		const audioInput = document.getElementById('audioInput');
+		const videoInput = document.getElementById('videoInput');
 		const createBtn = document.getElementById('createBtn');
 		const downloadBtn = document.getElementById('downloadBtn');
 		const progressBar = document.getElementById('progressBar');
-		const imagePreview = document.getElementById('imagePreview');
-		const audioPreview = document.getElementById('audioPreview');
 		const videoPreview = document.getElementById('videoPreview');
 
-		let imageData;
-		let audioData;
 		let videoData;
+		let inputVideoFile;
 
-		imageInput.addEventListener('change', async (e) => {
-			const file = e.target.files[0];
-			imageData = await fetchFile(file);
-			if (imageData && audioData) {
+		videoInput.addEventListener('change', async (e) => {
+			inputVideoFile = e.target.files[0];
+			if (inputVideoFile) {
 				createBtn.disabled = false;
 			}
-			const imageUrl = URL.createObjectURL(file);
-			imagePreview.src = imageUrl;
-			imagePreview.style.display = 'block';
-		});
-
-		audioInput.addEventListener('change', async (e) => {
-			const file = e.target.files[0];
-			audioData = await fetchFile(file);
-			if (imageData && audioData) {
-				createBtn.disabled = false;
-			}
-			const audioUrl = URL.createObjectURL(file);
-			audioPreview.src = audioUrl;
-			audioPreview.style.display = 'block';
 		});
 
 		downloadBtn.addEventListener('click', () => {
@@ -171,28 +148,28 @@
 		createBtn.addEventListener('click', createVideo);
 
 		async function createVideo() {
-			if (!imageData || !audioData) {
-				alert('Please select both an image and an audio file.');
+			if (!inputVideoFile) {
+				alert('Please select a video file.');
 				return;
 			}
 
 			progressBar.style.display = 'block';
+			createBtn.disabled = true;
 
-			ffmpeg.writeFile('image.png', new Uint8Array(imageData));
-			ffmpeg.writeFile('audio.mp3', new Uint8Array(audioData));
+			const inputName = 'input.' + inputVideoFile.name.split('.').pop();
+			await ffmpeg.writeFile(inputName, await fetchFile(inputVideoFile));
 
 			console.log("converting");
-			await ffmpeg.exec(["-loop", "1", "-i", "image.png", "-i", "audio.mp3", "-tune", "stillimage", "-shortest", "video.mp4"]);
+			await ffmpeg.exec(["-i", inputName, "output.mp4"]);
 			console.log("converted");
 
-			//await ffmpeg.exec('-loop', '1', '-i', 'image.jpg', '-i', 'audio.mp3', '-c:v', 'libx264', '-tune', 'stillimage', '-c:a', 'aac', '-b:a', '192k', '-pix_fmt', 'yuv420p', '-shortest', 'output.mp4');
-
-			videoData = await ffmpeg.readFile('video.mp4');
+			videoData = await ffmpeg.readFile('output.mp4');
 			const videoUrl = URL.createObjectURL(new Blob([videoData.buffer], { type: 'video/mp4' }));
 			videoPreview.src = videoUrl;
 			videoPreview.style.display = 'block';
 
 			downloadBtn.style.display = 'block';
+			createBtn.disabled = false;
 		}
 
 		ffmpeg.on("log", ({ message }) => {
