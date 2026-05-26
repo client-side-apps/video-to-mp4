@@ -4,17 +4,8 @@ const cacheName = 'videor-to-mp4-' + cacheVersion;
 const urlsToCache = [
   "/",
   "/icons/icon.svg",
-  "/node_modules/@ffmpeg/util/dist/esm/index.js",
-  "/node_modules/@ffmpeg/ffmpeg/dist/esm/index.js",
-  "/node_modules/@ffmpeg/ffmpeg/dist/esm/classes.js",
-  "/node_modules/@ffmpeg/util/dist/esm/errors.js",
-  "/node_modules/@ffmpeg/util/dist/esm/const.js",
-  "/node_modules/@ffmpeg/ffmpeg/dist/esm/const.js",
-  "/node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.js",
-  "/node_modules/@ffmpeg/core/dist/esm/ffmpeg-core.wasm",
-  "/node_modules/@ffmpeg/ffmpeg/dist/esm/utils.js",
-  "/node_modules/@ffmpeg/ffmpeg/dist/esm/errors.js",
-  "/node_modules/@ffmpeg/ffmpeg/dist/esm/worker.js",
+  "/style.css",
+  "/vendor/mediabunny.mjs",
 ];
 
 // On install, cache critical offline resources.
